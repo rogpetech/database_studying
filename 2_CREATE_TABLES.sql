@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-  username VARCHAR(60),
-  email VARCHAR(100),
+  username VARCHAR(60) NOT NULL UNIQUE,
+  email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(30),
   last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   is_admin BOOLEAN DEFAULT false,

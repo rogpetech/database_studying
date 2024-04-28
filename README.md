@@ -89,3 +89,11 @@ Um artigo pode ter vários comentários, e um comentário pertence a apenas um a
 Um usuário pode fazer vários comentários, mas cada comentário é feito por apenas um usuário. Relação de "um para muitos" entre Users e Comments.
 
 Um usuário pode favoritar vários artigos e um artigo pode ser favoritado por vários usuários. Relação de "muitos para muitos" entre Users e Articles através da tabela Favorites.
+
+
+
+
+
+### Install Debugger Go
+
+https://github.com/golang/vscode-go/blob/master/docs/debugging.md

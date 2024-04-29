@@ -31,12 +31,22 @@ func main() {
 	fmt.Scanln(&dbName)
 
 	if !checkDatabase(db, dbName) {
+		queryDrop := "DROP DATABASE IF EXISTS " + dbName
+
+		db.Exec(queryDrop)
+
 		var query string = "CREATE DATABASE "
+		fmt.Println("")
 		fmt.Printf("Database %s does not exist. Creating...\n", dbName)
+		fmt.Println("")
 		if _, err := db.Exec(query + dbName); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("")
+		fmt.Println("==================")
 		fmt.Println("Database created.")
+		fmt.Println("==================")
+		fmt.Println("")
 	}
 
 	db.Exec("USE " + dbName)
@@ -59,7 +69,7 @@ func main() {
 		case 2:
 			insertData(db)
 		case 3:
-			// readData(db)
+			readData(db)
 		case 4:
 			// updateData(db)
 		case 5:
@@ -108,19 +118,64 @@ func insertData(db *sql.DB) {
 	var tableName string
 	fmt.Scanln(&tableName)
 
-	var columns string
-	fmt.Println("Enter columns (e.g, id, name):")
-	fmt.Scanln(&columns)
+	reader := bufio.NewReader(os.Stdin)
 
-	var values string
+	fmt.Println("Enter columns (e.g, id, name):")
+	columns, _ := reader.ReadString('\n')
+	columns = strings.TrimSpace(columns)
+
 	fmt.Println("Enter values (e.g., 1, 'Jhon Doe'):")
-	fmt.Scanln(&values)
+	values, _ := reader.ReadString('\n')
+	values = strings.TrimSpace(values)
 
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, values)
-	fmt.Println("Query: %s", query)
+
 	if _, err := db.Exec(query); err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Data inserted.")
+}
+
+func readData(db *sql.DB) {
+	fmt.Println("Enter table name:")
+	var tableName string
+
+	fmt.Scanln(&tableName)
+
+	query := fmt.Sprintf("SELECT * FROM %s", tableName)
+	rows, err := db.Query(query)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	for i, column := range values {
+		fmt.Println()
+		fmt.Printf("%s: %s\n", columns[i], string(column))
+		fmt.Println()
+	}
+
 }

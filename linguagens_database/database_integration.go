@@ -71,9 +71,9 @@ func main() {
 		case 3:
 			readData(db)
 		case 4:
-			// updateData(db)
+			updateData(db)
 		case 5:
-			// deleteData(db)
+			deleteData(db)
 		case 6:
 			fmt.Println("Existing program")
 			os.Exit(0)
@@ -177,5 +177,55 @@ func readData(db *sql.DB) {
 		fmt.Printf("%s: %s\n", columns[i], string(column))
 		fmt.Println()
 	}
+}
+
+func updateData(db *sql.DB) {
+	fmt.Println("Enter table name:")
+	var tableName string
+	fmt.Scanln(&tableName)
+
+	fmt.Println("Enter SET clause (e.g., name = 'Carlos tester' where id=1)")
+	reader := bufio.NewReader(os.Stdin)
+	setClause, err := reader.ReadString('\n')
+	setClause = strings.TrimSpace(setClause)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s", tableName, setClause)
+
+	if _, err := db.Exec(query); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("")
+	fmt.Println("Data updated.")
+	fmt.Println("")
+
+}
+
+func deleteData(db *sql.DB) {
+	fmt.Println("Enter table name:")
+	var tableName string
+	fmt.Scanln(&tableName)
+
+	fmt.Println("Enter condition (e.g., id=1)")
+	reader := bufio.NewReader(os.Stdin)
+	condition, err := reader.ReadString('\n')
+	condition = strings.TrimSpace(condition)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableName, condition)
+	if _, err := db.Exec(query); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("")
+	fmt.Println("Data deleted.")
+	fmt.Println("")
 
 }
